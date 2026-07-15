@@ -1,0 +1,994 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Leaf Graphix — AI Assisted Concept Design Studio</title>
+<meta name="description" content="Leaf Graphix is an AI-assisted concept design studio in Kerala, turning ideas into digital reality — architectural concepts, ornament design, product design, brand identity and mood boards.">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,500;9..144,600;9..144,700&family=Manrope:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+<style>
+:root{
+  --bg: #06070a;
+  --bg-soft: #0b0d10;
+  --panel: rgba(255,255,255,0.05);
+  --panel-strong: rgba(255,255,255,0.09);
+  --border: rgba(255,255,255,0.12);
+  --ivory: #f3efe4;
+  --ivory-dim: #b9b6ab;
+  --muted: #7d7a71;
+  --gold: #c9a24b;
+  --gold-bright: #f2cf6a;
+  --gold-deep: #8a6a20;
+  --leaf: #7c9a5e;
+  --shadow: 0 30px 80px -20px rgba(0,0,0,0.7);
+  --ease: cubic-bezier(.16,.84,.44,1);
+}
+
+*{margin:0;padding:0;box-sizing:border-box;}
+html{background:var(--bg);}
+html.lenis, html.lenis body{height:auto;}
+.lenis.lenis-smooth{scroll-behavior:auto;}
+
+body{
+  font-family:'Manrope',sans-serif;
+  background:var(--bg);
+  color:var(--ivory);
+  overflow-x:hidden;
+  -webkit-font-smoothing:antialiased;
+  line-height:1.5;
+}
+
+@media (prefers-reduced-motion: reduce){
+  *{animation-duration:0.01ms !important; transition-duration:0.01ms !important;}
+}
+
+h1,h2,h3,h4,.serif{font-family:'Fraunces',serif;font-weight:500;letter-spacing:-0.01em;}
+
+::selection{background:var(--gold-deep);color:var(--ivory);}
+
+a{color:inherit;text-decoration:none;}
+img,video{display:block;max-width:100%;}
+button{font-family:inherit;cursor:pointer;background:none;border:none;color:inherit;}
+ul{list-style:none;}
+
+.container{width:min(1280px, 92%);margin:0 auto;}
+
+/* ---------- scrollbar ---------- */
+::-webkit-scrollbar{width:10px;}
+::-webkit-scrollbar-track{background:var(--bg);}
+::-webkit-scrollbar-thumb{background:linear-gradient(var(--gold-deep),var(--gold));border-radius:10px;}
+
+/* ================= PRELOADER ================= */
+#preloader{
+  position:fixed;inset:0;z-index:9999;
+  background:#000;
+  display:flex;align-items:center;justify-content:center;
+  transition:opacity 1.1s var(--ease), visibility 1.1s var(--ease);
+}
+#preloader.hide{opacity:0;visibility:hidden;pointer-events:none;}
+.preload-mark{
+  width:120px;height:120px;position:relative;
+  filter:drop-shadow(0 0 24px rgba(242,207,106,0.35));
+}
+.preload-mark img{width:100%;height:100%;object-fit:contain;opacity:0;transform:scale(0.85);
+  animation:markIn 1.4s var(--ease) 0.15s forwards;}
+@keyframes markIn{to{opacity:1;transform:scale(1);}}
+.preload-ring{
+  position:absolute;inset:-18px;border-radius:50%;
+  border:1px solid rgba(242,207,106,0.25);
+  border-top-color:var(--gold-bright);
+  animation:spin 1.6s linear infinite;
+}
+@keyframes spin{to{transform:rotate(360deg);}}
+.preload-label{
+  position:absolute;bottom:-46px;left:50%;transform:translateX(-50%);
+  font-size:11px;letter-spacing:0.35em;color:var(--ivory-dim);text-transform:uppercase;
+  opacity:0;animation:fadeUp 1s var(--ease) 0.6s forwards;white-space:nowrap;
+}
+@keyframes fadeUp{from{opacity:0;transform:translate(-50%,10px);}to{opacity:1;transform:translate(-50%,0);}}
+
+/* ================= FOG / CLOUD LAYERS (decorative CSS, not illustration) ================= */
+.fog-layer{
+  position:absolute;inset:0;pointer-events:none;mix-blend-mode:screen;opacity:0.55;
+  background:
+    radial-gradient(60% 40% at 15% 85%, rgba(255,255,255,0.16), transparent 70%),
+    radial-gradient(50% 35% at 80% 90%, rgba(255,255,255,0.12), transparent 70%),
+    radial-gradient(40% 30% at 50% 100%, rgba(255,255,255,0.14), transparent 70%);
+  animation:drift 22s ease-in-out infinite alternate;
+}
+.fog-layer.two{opacity:0.3;animation-duration:30s;animation-direction:alternate-reverse;
+  background:
+    radial-gradient(45% 30% at 30% 20%, rgba(255,255,255,0.10), transparent 70%),
+    radial-gradient(35% 25% at 70% 10%, rgba(255,255,255,0.08), transparent 70%);}
+@keyframes drift{
+  0%{transform:translateX(-3%) translateY(0);}
+  100%{transform:translateX(3%) translateY(-2%);}
+}
+
+/* ================= NAV ================= */
+header{
+  position:fixed;top:0;left:0;right:0;z-index:500;
+  padding:20px 0;
+  transition:background .4s var(--ease), padding .4s var(--ease), border-color .4s var(--ease);
+  border-bottom:1px solid transparent;
+}
+header.scrolled{
+  background:rgba(6,7,10,0.72);
+  backdrop-filter:blur(18px) saturate(140%);
+  -webkit-backdrop-filter:blur(18px) saturate(140%);
+  border-bottom:1px solid var(--border);
+  padding:13px 0;
+}
+.nav-inner{display:flex;align-items:center;justify-content:space-between;gap:24px;}
+.brand{display:flex;align-items:center;gap:12px;}
+.brand img{width:38px;height:38px;object-fit:contain;filter:drop-shadow(0 0 10px rgba(242,207,106,0.3));}
+.brand .word{display:flex;flex-direction:column;line-height:1;}
+.brand .word b{font-family:'Fraunces',serif;font-size:16px;letter-spacing:0.12em;font-weight:600;}
+.brand .word span{font-size:8.5px;letter-spacing:0.28em;color:var(--muted);margin-top:4px;text-transform:uppercase;}
+
+nav.links{display:flex;gap:2px;align-items:center;}
+nav.links a{
+  padding:9px 15px;font-size:13.5px;color:var(--ivory-dim);border-radius:100px;position:relative;
+  transition:color .3s;
+}
+nav.links a:hover{color:var(--ivory);}
+nav.links a.active{color:var(--gold-bright);}
+nav.links a.active::after{
+  content:'';position:absolute;left:16px;right:16px;bottom:4px;height:1px;background:var(--gold-bright);
+}
+
+.glass-btn{
+  display:inline-flex;align-items:center;gap:8px;
+  padding:12px 22px;border-radius:100px;font-size:13.5px;letter-spacing:0.02em;font-weight:600;
+  background:rgba(255,255,255,0.06);
+  border:1px solid rgba(242,207,106,0.4);
+  backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.12), 0 8px 24px -8px rgba(0,0,0,0.6);
+  color:var(--ivory);
+  transition:transform .35s var(--ease), background .35s, border-color .35s, box-shadow .35s;
+}
+.glass-btn:hover{
+  transform:translateY(-2px);
+  background:rgba(242,207,106,0.12);
+  border-color:var(--gold-bright);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.2), 0 12px 30px -8px rgba(242,207,106,0.25);
+}
+.glass-btn svg{width:14px;height:14px;transition:transform .35s var(--ease);}
+.glass-btn:hover svg{transform:translateX(3px);}
+.glass-btn.ghost{background:rgba(255,255,255,0.03);border-color:var(--border);}
+.glass-btn.ghost:hover{border-color:rgba(255,255,255,0.35);background:rgba(255,255,255,0.07);box-shadow:inset 0 1px 0 rgba(255,255,255,0.12), 0 12px 30px -8px rgba(0,0,0,0.5);}
+
+.menu-toggle{display:none;width:40px;height:40px;border-radius:50%;border:1px solid var(--border);align-items:center;justify-content:center;background:rgba(255,255,255,0.04);}
+.menu-toggle span{display:block;width:16px;height:1px;background:var(--ivory);position:relative;}
+.menu-toggle span::before,.menu-toggle span::after{content:'';position:absolute;left:0;width:16px;height:1px;background:var(--ivory);transition:transform .3s;}
+.menu-toggle span::before{top:-5px;}
+.menu-toggle span::after{top:5px;}
+
+/* ================= HERO ================= */
+.hero{
+  position:relative;min-height:100svh;display:flex;align-items:flex-end;overflow:hidden;
+  background:#000;
+}
+.hero-media{position:absolute;inset:0;z-index:0;}
+.hero-media video, .hero-media img{width:100%;height:100%;object-fit:cover;}
+.hero-media::after{
+  content:'';position:absolute;inset:0;
+  background:
+    linear-gradient(180deg, rgba(4,5,6,0.55) 0%, rgba(4,5,6,0.15) 30%, rgba(4,5,6,0.35) 62%, rgba(4,5,6,0.92) 100%),
+    linear-gradient(90deg, rgba(4,5,6,0.55) 0%, transparent 35%, transparent 65%, rgba(4,5,6,0.35) 100%);
+}
+.hero-content{position:relative;z-index:2;width:100%;padding:0 0 64px;}
+.hero-grid{display:grid;grid-template-columns:1.5fr 1fr;gap:40px;align-items:end;}
+.eyebrow{display:flex;align-items:center;gap:10px;font-size:12px;letter-spacing:0.32em;text-transform:uppercase;color:var(--gold-bright);margin-bottom:22px;opacity:0;}
+.eyebrow .dash{width:26px;height:1px;background:var(--gold-bright);}
+.hero h1{
+  font-size:clamp(2.6rem, 6vw, 5.2rem);
+  line-height:1.02;font-weight:500;color:var(--ivory);
+}
+.hero h1 .line{display:block;overflow:hidden;}
+.hero h1 .line span{display:inline-block;opacity:0;transform:translateY(115%);}
+.hero h1 em{font-style:italic;color:var(--gold-bright);font-weight:400;}
+.hero-sub{
+  max-width:440px;color:var(--ivory-dim);font-size:15.5px;margin-top:24px;opacity:0;
+}
+.hero-cta{display:flex;gap:14px;margin-top:34px;opacity:0;flex-wrap:wrap;}
+.hero-side{display:flex;flex-direction:column;gap:18px;align-items:flex-end;text-align:right;opacity:0;}
+.hero-side p{font-size:13.5px;color:var(--ivory-dim);max-width:260px;}
+.hero-side .malayalam{font-size:12px;color:var(--gold);letter-spacing:0.04em;}
+
+.scroll-cue{
+  position:absolute;bottom:26px;left:50%;transform:translateX(-50%);z-index:3;
+  display:flex;flex-direction:column;align-items:center;gap:10px;opacity:0;
+}
+.scroll-cue .dot-track{width:22px;height:36px;border:1px solid rgba(255,255,255,0.35);border-radius:20px;position:relative;}
+.scroll-cue .dot-track i{position:absolute;left:50%;top:6px;width:4px;height:4px;background:var(--gold-bright);border-radius:50%;transform:translateX(-50%);animation:scrollDot 1.8s ease-in-out infinite;}
+@keyframes scrollDot{0%{top:6px;opacity:1;}80%{top:22px;opacity:0;}100%{top:22px;opacity:0;}}
+.scroll-cue span{font-size:9.5px;letter-spacing:0.3em;color:var(--ivory-dim);text-transform:uppercase;}
+
+/* stat bar */
+.statbar{
+  position:relative;z-index:4;margin-top:44px;
+  display:grid;grid-template-columns:repeat(5,1fr);
+  background:rgba(10,11,13,0.55);
+  border:1px solid var(--border);border-radius:20px;
+  backdrop-filter:blur(20px) saturate(150%);-webkit-backdrop-filter:blur(20px) saturate(150%);
+  box-shadow:var(--shadow);
+  opacity:0;
+}
+.statbar .stat{padding:22px 18px;text-align:center;border-right:1px solid var(--border);}
+.statbar .stat:last-child{border-right:none;}
+.statbar .stat b{font-family:'Fraunces',serif;font-size:1.7rem;color:var(--gold-bright);font-weight:500;display:block;}
+.statbar .stat small{font-size:11px;color:var(--muted);letter-spacing:0.03em;}
+
+/* ================= SECTION SHARED ================= */
+section{position:relative;padding:150px 0;}
+.section-head{max-width:640px;margin-bottom:70px;}
+.tag{display:inline-flex;align-items:center;gap:9px;font-size:11.5px;letter-spacing:0.3em;text-transform:uppercase;color:var(--gold);margin-bottom:18px;}
+.tag::before{content:'';width:16px;height:1px;background:var(--gold);}
+.section-head h2{font-size:clamp(2rem,4vw,3.1rem);font-weight:500;color:var(--ivory);}
+.section-head p{color:var(--ivory-dim);margin-top:18px;font-size:15.5px;max-width:520px;}
+.reveal{opacity:0;transform:translateY(48px);}
+
+/* ================= STUDIO SECTION ================= */
+.studio{background:linear-gradient(180deg,#06070a 0%, #08090c 100%);}
+.studio-grid{display:grid;grid-template-columns:0.9fr 1.1fr;gap:70px;align-items:center;}
+.studio-visual{position:relative;border-radius:24px;overflow:hidden;box-shadow:var(--shadow);aspect-ratio:4/5;}
+.studio-visual img{width:100%;height:100%;object-fit:cover;transform:scale(1.12);}
+.studio-visual::after{content:'';position:absolute;inset:0;background:linear-gradient(200deg, transparent 55%, rgba(0,0,0,0.55));}
+.studio-visual .fog-layer{opacity:0.35;}
+.studio-badge{
+  position:absolute;left:22px;bottom:22px;z-index:2;
+  padding:14px 20px;border-radius:16px;
+  background:rgba(8,9,11,0.55);border:1px solid var(--border);
+  backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+  display:flex;align-items:center;gap:12px;
+}
+.studio-badge .num{font-family:'Fraunces',serif;color:var(--gold-bright);font-size:1.5rem;}
+.studio-badge .lbl{font-size:11px;color:var(--ivory-dim);line-height:1.3;max-width:130px;}
+
+.studio-copy h3{font-size:clamp(1.7rem,3vw,2.5rem);margin-bottom:22px;}
+.studio-copy p{color:var(--ivory-dim);font-size:15.5px;margin-bottom:18px;max-width:520px;}
+.studio-copy p b{color:var(--ivory);font-weight:600;}
+
+.chip-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:28px;}
+.chip{
+  padding:9px 16px;border-radius:100px;font-size:12.5px;color:var(--ivory-dim);
+  border:1px solid var(--border);background:rgba(255,255,255,0.03);
+}
+
+/* ================= PROCESS (dotted path) ================= */
+.process{background:#050608;}
+.process-grid{display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:center;}
+.process-path{position:relative;padding-left:36px;}
+.process-path::before{
+  content:'';position:absolute;left:9px;top:10px;bottom:10px;width:1px;
+  background:repeating-linear-gradient(to bottom, var(--gold) 0 6px, transparent 6px 14px);
+}
+.process-step{position:relative;padding-bottom:56px;}
+.process-step:last-child{padding-bottom:0;}
+.process-step::before{
+  content:'';position:absolute;left:-36px;top:2px;width:19px;height:19px;border-radius:50%;
+  background:var(--bg);border:1px solid var(--gold);box-shadow:0 0 0 4px rgba(201,162,75,0.08);
+}
+.process-step .pnum{font-family:'Fraunces',serif;font-size:12px;color:var(--gold);letter-spacing:0.1em;margin-bottom:8px;display:block;}
+.process-step h4{font-size:1.3rem;margin-bottom:8px;font-weight:500;}
+.process-step p{color:var(--ivory-dim);font-size:14.5px;max-width:400px;}
+
+.process-visual{position:relative;border-radius:24px;overflow:hidden;aspect-ratio:1/1.05;box-shadow:var(--shadow);}
+.process-visual img{width:100%;height:100%;object-fit:cover;}
+.process-visual::after{content:'';position:absolute;inset:0;background:linear-gradient(0deg, rgba(0,0,0,0.55), transparent 45%);}
+
+/* ================= SERVICES ================= */
+.services{background:linear-gradient(180deg,#08090c, #06070a);}
+.service-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;}
+.service-card{
+  position:relative;padding:34px 28px;border-radius:22px;
+  background:var(--panel);border:1px solid var(--border);
+  backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+  transition:transform .5s var(--ease), border-color .5s, background .5s;
+  overflow:hidden;
+}
+.service-card::before{
+  content:'';position:absolute;inset:0;opacity:0;
+  background:radial-gradient(400px 200px at 20% 0%, rgba(242,207,106,0.12), transparent 60%);
+  transition:opacity .5s;
+}
+.service-card:hover{transform:translateY(-8px);border-color:rgba(242,207,106,0.35);background:var(--panel-strong);}
+.service-card:hover::before{opacity:1;}
+.service-card .si{
+  width:46px;height:46px;border-radius:13px;display:flex;align-items:center;justify-content:center;
+  background:rgba(242,207,106,0.1);border:1px solid rgba(242,207,106,0.25);margin-bottom:22px;
+}
+.service-card .si svg{width:22px;height:22px;stroke:var(--gold-bright);}
+.service-card h4{font-size:1.25rem;margin-bottom:10px;font-weight:500;}
+.service-card p{font-size:14px;color:var(--ivory-dim);margin-bottom:20px;}
+.service-card .sn{position:absolute;top:26px;right:28px;font-family:'Fraunces',serif;font-size:12px;color:var(--muted);}
+.service-link{font-size:13px;color:var(--gold-bright);display:inline-flex;align-items:center;gap:6px;}
+.service-link svg{width:12px;height:12px;transition:transform .3s;}
+.service-card:hover .service-link svg{transform:translateX(4px);}
+
+/* ================= TRANSITION VIDEO BAND ================= */
+.cine-band{position:relative;height:78vh;overflow:hidden;background:#000;}
+.cine-band video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0.85;}
+.cine-band::before{content:'';position:absolute;inset:0;z-index:1;background:linear-gradient(180deg, var(--bg) 0%, transparent 14%, transparent 86%, var(--bg) 100%);}
+.cine-copy{position:absolute;inset:0;z-index:2;display:flex;align-items:center;justify-content:center;text-align:center;padding:0 20px;}
+.cine-copy h3{font-size:clamp(1.8rem,4.4vw,3.6rem);max-width:900px;color:var(--ivory);font-weight:400;}
+.cine-copy h3 em{color:var(--gold-bright);font-style:italic;}
+
+/* ================= PORTFOLIO ================= */
+.portfolio{background:#06070a;}
+.folio-tabs{display:flex;gap:10px;margin-bottom:50px;flex-wrap:wrap;}
+.folio-tab{padding:10px 18px;border-radius:100px;font-size:12.5px;border:1px solid var(--border);color:var(--ivory-dim);background:rgba(255,255,255,0.02);}
+.folio-tab.active{color:var(--gold-bright);border-color:rgba(242,207,106,0.4);background:rgba(242,207,106,0.08);}
+
+.folio-stack{display:flex;flex-direction:column;gap:26px;}
+.folio-row{
+  display:grid;grid-template-columns:0.85fr 1.15fr;gap:0;border-radius:26px;overflow:hidden;
+  background:var(--panel);border:1px solid var(--border);
+}
+.folio-row:nth-child(even){grid-template-columns:1.15fr 0.85fr;}
+.folio-row:nth-child(even) .folio-media{order:2;}
+.folio-media{position:relative;aspect-ratio:5/4;overflow:hidden;}
+.folio-media img{width:100%;height:100%;object-fit:cover;transition:transform 1.1s var(--ease);}
+.folio-row:hover .folio-media img{transform:scale(1.06);}
+.folio-media .fog-layer{opacity:0.25;}
+.folio-info{padding:48px;display:flex;flex-direction:column;justify-content:center;}
+.folio-info .fnum{font-family:'Fraunces',serif;font-size:13px;color:var(--gold);margin-bottom:14px;letter-spacing:0.08em;}
+.folio-info h3{font-size:clamp(1.5rem,2.6vw,2.1rem);margin-bottom:14px;}
+.folio-info p{color:var(--ivory-dim);font-size:14.5px;margin-bottom:22px;max-width:420px;}
+.folio-meta{display:flex;gap:24px;margin-top:6px;flex-wrap:wrap;}
+.folio-meta div{font-size:11px;color:var(--muted);letter-spacing:0.05em;text-transform:uppercase;}
+.folio-meta div b{display:block;color:var(--ivory-dim);font-size:13px;text-transform:none;letter-spacing:0;margin-top:4px;font-family:'Manrope',sans-serif;}
+
+/* ================= ABOUT ================= */
+.about{background:linear-gradient(180deg,#06070a, #0a0b0e);}
+.about-grid{display:grid;grid-template-columns:1fr 1fr;gap:70px;align-items:center;}
+.about-quote{font-family:'Fraunces',serif;font-size:clamp(1.5rem,2.8vw,2.3rem);font-weight:400;line-height:1.35;color:var(--ivory);}
+.about-quote em{color:var(--gold-bright);font-style:italic;}
+.about-quote + p{margin-top:26px;color:var(--ivory-dim);font-size:15px;max-width:480px;}
+.about-stats{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:36px;}
+.about-stats .b{padding:20px;border-radius:16px;border:1px solid var(--border);background:var(--panel);}
+.about-stats .b b{font-family:'Fraunces',serif;font-size:1.6rem;color:var(--gold-bright);display:block;}
+.about-stats .b small{font-size:11.5px;color:var(--muted);}
+.about-visual{position:relative;border-radius:24px;overflow:hidden;aspect-ratio:4/5;box-shadow:var(--shadow);}
+.about-visual img{width:100%;height:100%;object-fit:cover;}
+.about-visual::after{content:'';position:absolute;inset:0;background:linear-gradient(200deg, transparent 50%, rgba(0,0,0,0.5));}
+
+/* ================= CONTACT ================= */
+.contact{background:#050608;overflow:hidden;position:relative;}
+.contact::before{
+  content:'';position:absolute;inset:0;z-index:0;opacity:0.5;
+  background:radial-gradient(60% 60% at 80% 20%, rgba(201,162,75,0.12), transparent 70%);
+}
+.contact-inner{position:relative;z-index:1;display:grid;grid-template-columns:1fr 1fr;gap:70px;align-items:start;}
+.contact-copy h2{font-size:clamp(2rem,4.4vw,3.4rem);margin-bottom:20px;}
+.contact-copy p{color:var(--ivory-dim);font-size:15.5px;max-width:420px;margin-bottom:30px;}
+.contact-detail{display:flex;flex-direction:column;gap:18px;margin-top:20px;}
+.contact-detail div{display:flex;gap:14px;align-items:flex-start;}
+.contact-detail .ci{width:38px;height:38px;border-radius:11px;background:rgba(242,207,106,0.1);border:1px solid rgba(242,207,106,0.25);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.contact-detail .ci svg{width:17px;height:17px;stroke:var(--gold-bright);}
+.contact-detail b{display:block;font-size:14px;margin-bottom:3px;}
+.contact-detail span{font-size:13px;color:var(--ivory-dim);}
+
+.form-glass{
+  padding:40px;border-radius:26px;background:var(--panel);border:1px solid var(--border);
+  backdrop-filter:blur(20px) saturate(150%);-webkit-backdrop-filter:blur(20px) saturate(150%);
+  box-shadow:var(--shadow);
+}
+.field{margin-bottom:20px;}
+.field label{display:block;font-size:11.5px;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:9px;}
+.field input,.field textarea,.field select{
+  width:100%;padding:13px 16px;border-radius:12px;background:rgba(255,255,255,0.04);
+  border:1px solid var(--border);color:var(--ivory);font-family:inherit;font-size:14px;
+  transition:border-color .3s, background .3s;
+}
+.field input:focus,.field textarea:focus,.field select:focus{outline:none;border-color:var(--gold);background:rgba(255,255,255,0.06);}
+.field textarea{resize:vertical;min-height:100px;}
+.form-glass .glass-btn{width:100%;justify-content:center;margin-top:6px;}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+
+/* ================= FOOTER ================= */
+footer{background:#030405;padding:70px 0 30px;border-top:1px solid var(--border);}
+.foot-top{display:grid;grid-template-columns:1.3fr 1fr 1fr 1fr;gap:40px;padding-bottom:50px;border-bottom:1px solid var(--border);}
+.foot-brand .brand{margin-bottom:18px;}
+.foot-brand p{font-size:13.5px;color:var(--ivory-dim);max-width:280px;margin-bottom:6px;}
+.foot-brand .malayalam{color:var(--gold);font-size:12.5px;}
+.foot-col h5{font-size:12px;letter-spacing:0.15em;text-transform:uppercase;color:var(--muted);margin-bottom:18px;}
+.foot-col a{display:block;font-size:13.5px;color:var(--ivory-dim);margin-bottom:12px;transition:color .3s;}
+.foot-col a:hover{color:var(--gold-bright);}
+.foot-bottom{display:flex;justify-content:space-between;align-items:center;padding-top:26px;flex-wrap:wrap;gap:14px;}
+.foot-bottom p{font-size:12px;color:var(--muted);}
+.foot-social{display:flex;gap:10px;}
+.foot-social a{width:36px;height:36px;border-radius:50%;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;}
+.foot-social a svg{width:15px;height:15px;stroke:var(--ivory-dim);}
+.foot-social a:hover{border-color:var(--gold);}
+.foot-social a:hover svg{stroke:var(--gold-bright);}
+
+/* ================= CURSOR GLOW (subtle, desktop only) ================= */
+.cursor-glow{
+  position:fixed;width:420px;height:420px;border-radius:50%;pointer-events:none;z-index:1;
+  background:radial-gradient(circle, rgba(201,162,75,0.06), transparent 70%);
+  transform:translate(-50%,-50%);transition:opacity .3s;
+  will-change:transform;
+}
+
+/* ================= RESPONSIVE ================= */
+@media (max-width: 1024px){
+  .studio-grid,.about-grid,.contact-inner{grid-template-columns:1fr;gap:44px;}
+  .process-grid{grid-template-columns:1fr;}
+  .process-visual{order:-1;max-height:340px;}
+  .service-grid{grid-template-columns:repeat(2,1fr);}
+  .folio-row,.folio-row:nth-child(even){grid-template-columns:1fr;}
+  .folio-row:nth-child(even) .folio-media{order:0;}
+  .foot-top{grid-template-columns:1fr 1fr;}
+}
+@media (max-width: 760px){
+  nav.links{display:none;}
+  .menu-toggle{display:flex;}
+  .hero-grid{grid-template-columns:1fr;}
+  .hero-side{align-items:flex-start;text-align:left;margin-top:10px;}
+  .statbar{grid-template-columns:repeat(2,1fr);}
+  .statbar .stat:nth-child(2n){border-right:none;}
+  .statbar .stat{border-bottom:1px solid var(--border);}
+  section{padding:90px 0;}
+  .service-grid{grid-template-columns:1fr;}
+  .foot-top{grid-template-columns:1fr;gap:32px;}
+  .two-col{grid-template-columns:1fr;}
+  .cine-band{height:56vh;}
+}
+
+/* mobile nav drawer */
+.mobile-drawer{
+  position:fixed;inset:0;z-index:600;background:rgba(4,5,6,0.97);backdrop-filter:blur(20px);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;
+  opacity:0;visibility:hidden;transition:opacity .4s var(--ease), visibility .4s var(--ease);
+}
+.mobile-drawer.open{opacity:1;visibility:visible;}
+.mobile-drawer a{font-family:'Fraunces',serif;font-size:26px;padding:14px 0;color:var(--ivory-dim);}
+.mobile-drawer a.active{color:var(--gold-bright);}
+.mobile-close{position:absolute;top:26px;right:26px;width:42px;height:42px;border-radius:50%;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;}
+
+</style>
+</head>
+<body>
+
+<!-- ================= PRELOADER ================= -->
+<div id="preloader">
+  <div class="preload-mark">
+    <div class="preload-ring"></div>
+    <img src="assets/logo-lf-transparent.png" alt="Leaf Graphix">
+    <div class="preload-label">Leaf Graphix</div>
+  </div>
+</div>
+
+<div class="cursor-glow" id="cursorGlow"></div>
+
+<!-- ================= NAV ================= -->
+<header id="siteHeader">
+  <div class="container nav-inner">
+    <a href="#home" class="brand">
+      <img src="assets/logo-lf-transparent.png" alt="Leaf Graphix logo">
+      <div class="word"><b>LEAF GRAPHIX</b><span>AI Assisted Studio</span></div>
+    </a>
+    <nav class="links">
+      <a href="#home" class="active">Home</a>
+      <a href="#studio">Studio</a>
+      <a href="#services">Services</a>
+      <a href="#portfolio">Portfolio</a>
+      <a href="#about">About</a>
+      <a href="#contact">Contact</a>
+    </nav>
+    <a href="#contact" class="glass-btn">Start a Project
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+    </a>
+    <button class="menu-toggle" id="menuToggle" aria-label="Open menu"><span></span></button>
+  </div>
+</header>
+
+<div class="mobile-drawer" id="mobileDrawer">
+  <button class="mobile-close" id="mobileClose" aria-label="Close menu">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#f3efe4" stroke-width="2"><path d="M6 6l12 12M18 6L6 18"/></svg>
+  </button>
+  <a href="#home">Home</a>
+  <a href="#studio">Studio</a>
+  <a href="#services">Services</a>
+  <a href="#portfolio">Portfolio</a>
+  <a href="#about">About</a>
+  <a href="#contact">Contact</a>
+</div>
+
+<!-- ================= HERO ================= -->
+<section class="hero" id="home">
+  <div class="hero-media">
+    <video autoplay muted loop playsinline poster="assets/hero-poster.jpg" id="heroVideo">
+      <source src="assets/hero-fog.mp4" type="video/mp4">
+    </video>
+    <div class="fog-layer"></div>
+    <div class="fog-layer two"></div>
+  </div>
+
+  <div class="hero-content container">
+    <div class="hero-grid">
+      <div>
+        <div class="eyebrow"><span class="dash"></span>Welcome to Leaf Graphix &nbsp;·&nbsp; ലീഫ് ഗ്രാഫിക്സ്</div>
+        <h1>
+          <span class="line"><span>We turn Ideas</span></span>
+          <span class="line"><span>into <em>Digital Reality</em></span></span>
+        </h1>
+        <p class="hero-sub">An AI-assisted concept design studio crafting architectural concepts, ornament design, brand identity and mood boards — the clarity that comes before a single brick is laid.</p>
+        <div class="hero-cta">
+          <a href="#portfolio" class="glass-btn">Explore Our Studio
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+          </a>
+          <a href="#contact" class="glass-btn ghost">Start a Project</a>
+        </div>
+      </div>
+      <div class="hero-side">
+        <p>Every project begins in fog — an idea without form. We stay in that space until the shape becomes unmistakable.</p>
+        <span class="malayalam">ആശയങ്ങളെ യാഥാർഥ്യമാക്കുന്നു</span>
+      </div>
+    </div>
+
+    <div class="statbar">
+      <div class="stat"><b data-count="250">0</b><small>Projects Delivered</small></div>
+      <div class="stat"><b data-count="98" data-suffix="%">0</b><small>Client Satisfaction</small></div>
+      <div class="stat"><b data-count="12" data-suffix="+">0</b><small>Industries Served</small></div>
+      <div class="stat"><b>∞</b><small>Possibilities</small></div>
+      <div class="stat"><b>24/7</b><small>Support &amp; Collaboration</small></div>
+    </div>
+  </div>
+
+  <div class="scroll-cue"><div class="dot-track"><i></i></div><span>Scroll</span></div>
+</section>
+
+<!-- ================= STUDIO ================= -->
+<section class="studio" id="studio">
+  <div class="container">
+    <div class="studio-grid">
+      <div class="studio-visual reveal">
+        <img src="assets/misty-villa-dusk.webp" alt="Concept villa emerging from misty forest, dusk">
+        <div class="fog-layer"></div>
+        <div class="studio-badge">
+          <span class="num">01</span>
+          <span class="lbl">The clarity phase, before construction begins</span>
+        </div>
+      </div>
+      <div class="studio-copy">
+        <div class="tag">The Studio</div>
+        <h3 class="reveal">We design the dream, <br>not just the render.</h3>
+        <p class="reveal"><b>Leaf Graphix is a Kerala-based concept design studio</b> — not a render house. We work in the space between a client's vision and the architect's first drawing, giving shape to ideas through AI-assisted concept art, mood boards and brand direction.</p>
+        <p class="reveal">Every villa, ornament or identity we touch carries a point of view rooted in Kerala's own materials, light and craft — dressed in a cinematic, dark-gold language that feels premium without losing warmth.</p>
+        <div class="chip-row reveal">
+          <span class="chip">Architectural Concepts</span>
+          <span class="chip">Ornament Design</span>
+          <span class="chip">Product Design</span>
+          <span class="chip">Brand Identity</span>
+          <span class="chip">Mood Boards</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= PROCESS ================= -->
+<section class="process" id="approach">
+  <div class="container">
+    <div class="section-head reveal">
+      <div class="tag">How We Work</div>
+      <h2>From fog to form, in four moves.</h2>
+      <p>A deliberate process for the pre-construction phase — the part of a project where clarity matters most.</p>
+    </div>
+    <div class="process-grid">
+      <div class="process-path">
+        <div class="process-step reveal">
+          <span class="pnum">01 · Strategy</span>
+          <h4>Understand the vision</h4>
+          <p>We start with conversation, references and site context — planning with purpose before a single concept is drawn.</p>
+        </div>
+        <div class="process-step reveal">
+          <span class="pnum">02 · AI Development</span>
+          <h4>Build with intelligent tools</h4>
+          <p>AI-assisted workflows accelerate exploration, letting us test more directions without sacrificing craft.</p>
+        </div>
+        <div class="process-step reveal">
+          <span class="pnum">03 · Creativity &amp; Design</span>
+          <h4>Craft the visual story</h4>
+          <p>Concepts are refined into cinematic renders, ornament studies and brand systems that feel inevitable.</p>
+        </div>
+        <div class="process-step reveal">
+          <span class="pnum">04 · Client Experience</span>
+          <h4>Deliver with clarity</h4>
+          <p>We hand off a clear, presentation-ready concept package your architect or manufacturer can act on immediately.</p>
+        </div>
+      </div>
+      <div class="process-visual reveal">
+        <img src="assets/forest-villa-day.webp" alt="Concept villa nestled in green forest canopy">
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= SERVICES ================= -->
+<section class="services" id="services">
+  <div class="container">
+    <div class="section-head reveal">
+      <div class="tag">Services</div>
+      <h2>Five ways we bring ideas into form.</h2>
+      <p>Each service is priced and scoped for the clarity phase — the dreaming that happens before construction, manufacturing or launch.</p>
+    </div>
+    <div class="service-grid">
+
+      <div class="service-card reveal">
+        <span class="sn">01</span>
+        <div class="si"><svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.6"><path d="M3 21h18M5 21V9l7-5 7 5v12M9 21v-6h6v6"/></svg></div>
+        <h4>Architectural Concepts</h4>
+        <p>Cinematic exterior &amp; interior concept visuals that translate a client's brief into a believable, buildable vision.</p>
+        <span class="service-link">View approach <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+      </div>
+
+      <div class="service-card reveal">
+        <span class="sn">02</span>
+        <div class="si"><svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.6"><circle cx="12" cy="12" r="9"/><path d="M12 3v18M3 12h18"/></svg></div>
+        <h4>Ornament Design</h4>
+        <p>Bronze, gold-wash and gemstone-inlay ornament concepts developed with manufacturing feasibility in mind.</p>
+        <span class="service-link">View approach <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+      </div>
+
+      <div class="service-card reveal">
+        <span class="sn">03</span>
+        <div class="si"><svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.6"><rect x="4" y="4" width="16" height="16" rx="3"/><path d="M4 14h16"/></svg></div>
+        <h4>Product Design</h4>
+        <p>Concept-to-render product visualization for teams who need to see an idea before committing to tooling.</p>
+        <span class="service-link">View approach <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+      </div>
+
+      <div class="service-card reveal">
+        <span class="sn">04</span>
+        <div class="si"><svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.6"><path d="M4 4l16 16M4 20L20 4"/></svg></div>
+        <h4>Brand Identity</h4>
+        <p>Logo systems, colour language and voice for studios and ventures that need to feel premium from day one.</p>
+        <span class="service-link">View approach <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+      </div>
+
+      <div class="service-card reveal">
+        <span class="sn">05</span>
+        <div class="si"><svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.6"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg></div>
+        <h4>Mood Boards</h4>
+        <p>Tightly curated visual direction decks that align every stakeholder before design work begins.</p>
+        <span class="service-link">View approach <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+      </div>
+
+      <div class="service-card reveal" style="display:flex;flex-direction:column;justify-content:center;background:linear-gradient(160deg, rgba(242,207,106,0.1), rgba(255,255,255,0.03));">
+        <h4 style="margin-bottom:10px;">Not sure where to start?</h4>
+        <p>Tell us about your project and we'll recommend the right service mix.</p>
+        <a href="#contact" class="glass-btn" style="align-self:flex-start;">Talk to us
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+        </a>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ================= CINEMATIC TRANSITION BAND ================= -->
+<div class="cine-band">
+  <video autoplay muted loop playsinline id="cineVideo">
+    <source src="assets/transition.mp4" type="video/mp4">
+  </video>
+  <div class="cine-copy">
+    <h3 class="reveal">A concept isn't finished until it feels <em>inevitable.</em></h3>
+  </div>
+</div>
+
+<!-- ================= PORTFOLIO ================= -->
+<section class="portfolio" id="portfolio">
+  <div class="container">
+    <div class="section-head reveal">
+      <div class="tag">Selected Work</div>
+      <h2>Concepts that became conversation starters.</h2>
+      <p>A look at recent concept-design work — from nature-integrated luxury villas to ornament and brand systems.</p>
+    </div>
+
+    <div class="folio-stack">
+      <div class="folio-row reveal">
+        <div class="folio-media">
+          <img src="assets/forest-villa-day.webp" alt="Nature-integrated luxury villa concept in green canopy">
+          <div class="fog-layer"></div>
+        </div>
+        <div class="folio-info">
+          <span class="fnum">Project 01</span>
+          <h3>Canopy Villa</h3>
+          <p>A tiered, nature-integrated luxury villa concept designed to sit inside the forest canopy rather than above it — glass, timber and stone in quiet conversation with the trees.</p>
+          <div class="folio-meta">
+            <div>Category<b>Architectural Concept</b></div>
+            <div>Site<b>Western Ghats, Kerala</b></div>
+            <div>Scope<b>Concept + Mood Board</b></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="folio-row reveal">
+        <div class="folio-media">
+          <img src="assets/misty-villa-dusk.webp" alt="Villa concept emerging through dusk fog">
+          <div class="fog-layer"></div>
+        </div>
+        <div class="folio-info">
+          <span class="fnum">Project 02</span>
+          <h3>Fogline Residence</h3>
+          <p>Explored at dusk, when the mist reveals the villa one storey at a time — a study in atmosphere used to pitch the emotional arc of the home to its owners.</p>
+          <div class="folio-meta">
+            <div>Category<b>Architectural Concept</b></div>
+            <div>Mood<b>Cinematic Dusk</b></div>
+            <div>Scope<b>Concept + Film</b></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="folio-row reveal">
+        <div class="folio-media">
+          <img src="assets/skyline-villa-dusk.webp" alt="Villa concept overlooking a distant city skyline">
+          <div class="fog-layer"></div>
+        </div>
+        <div class="folio-info">
+          <span class="fnum">Project 03</span>
+          <h3>Horizon House</h3>
+          <p>A hillside concept that frames a distant skyline through the treeline — designed for a client who wanted proximity to the city without losing the forest.</p>
+          <div class="folio-meta">
+            <div>Category<b>Architectural Concept</b></div>
+            <div>View<b>City Skyline</b></div>
+            <div>Scope<b>Full Concept Package</b></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div style="margin-top:56px;display:flex;justify-content:center;">
+      <div class="studio-visual reveal" style="max-width:900px;width:100%;aspect-ratio:16/8;">
+        <video autoplay muted loop playsinline style="width:100%;height:100%;object-fit:cover;">
+          <source src="assets/villa-tour.mp4" type="video/mp4">
+        </video>
+        <div class="studio-badge" style="left:auto;right:22px;">
+          <span class="lbl" style="max-width:200px;">Interior &amp; exterior walkthrough — concept film</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= ABOUT ================= -->
+<section class="about" id="about">
+  <div class="container">
+    <div class="about-grid">
+      <div>
+        <div class="tag">About Us</div>
+        <p class="about-quote reveal">"We differentiate as a <em>concept design studio</em>, not a render company — serving the dreaming phase, before an architect ever picks up a pencil."</p>
+        <p class="reveal">Founded in Kerala, Leaf Graphix pairs AI-assisted workflows with a genuinely bilingual, culturally grounded point of view — built for clients across architecture, product and brand who need clarity fast, without losing craft.</p>
+        <div class="about-stats reveal">
+          <div class="b"><b>250+</b><small>Concepts Delivered</small></div>
+          <div class="b"><b>12+</b><small>Industries Served</small></div>
+          <div class="b"><b>98%</b><small>Client Satisfaction</small></div>
+          <div class="b"><b>24/7</b><small>Studio Availability</small></div>
+        </div>
+      </div>
+      <div class="about-visual reveal">
+        <img src="assets/forest-villa-day.webp" alt="Leaf Graphix studio concept work, villa in forest canopy">
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= CONTACT ================= -->
+<section class="contact" id="contact">
+  <div class="container contact-inner">
+    <div class="contact-copy">
+      <div class="tag">Start a Project</div>
+      <h2 class="reveal">Let's give your idea its first form.</h2>
+      <p class="reveal">Tell us what you're building — a villa, a product, a brand — and we'll come back with a clear plan for the clarity phase.</p>
+      <div class="contact-detail reveal">
+        <div>
+          <span class="ci"><svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.6"><path d="M3 5h18v14H3z"/><path d="M3 7l9 6 9-6"/></svg></span>
+          <div><b>Email</b><span>hello@leafgraphix.studio</span></div>
+        </div>
+        <div>
+          <span class="ci"><svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.6"><path d="M22 16.9v3a2 2 0 01-2.2 2 19.8 19.8 0 01-8.6-3.1 19.5 19.5 0 01-6-6A19.8 19.8 0 012.1 4.2 2 2 0 014.1 2h3a2 2 0 012 1.7c.1.9.3 1.8.6 2.7a2 2 0 01-.4 2.1L8.1 9.8a16 16 0 006 6l1.3-1.2a2 2 0 012.1-.4c.9.3 1.8.5 2.7.6a2 2 0 011.8 2.1z"/></svg></span>
+          <div><b>Phone</b><span>+91 00000 00000</span></div>
+        </div>
+        <div>
+          <span class="ci"><svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.6"><path d="M12 21s-7-6.2-7-11a7 7 0 0114 0c0 4.8-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/></svg></span>
+          <div><b>Studio</b><span>Kollam, Kerala, India</span></div>
+        </div>
+      </div>
+    </div>
+
+    <form class="form-glass reveal" onsubmit="event.preventDefault(); this.querySelector('.glass-btn').textContent='Message Sent ✓';">
+      <div class="two-col">
+        <div class="field"><label>Name</label><input type="text" placeholder="Your name" required></div>
+        <div class="field"><label>Email</label><input type="email" placeholder="you@email.com" required></div>
+      </div>
+      <div class="field">
+        <label>Project Type</label>
+        <select>
+          <option>Architectural Concept</option>
+          <option>Ornament Design</option>
+          <option>Product Design</option>
+          <option>Brand Identity</option>
+          <option>Mood Board</option>
+        </select>
+      </div>
+      <div class="field"><label>Tell us about your project</label><textarea placeholder="A few lines about your vision..."></textarea></div>
+      <button class="glass-btn" type="submit">Send Message
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+      </button>
+    </form>
+  </div>
+</section>
+
+<!-- ================= FOOTER ================= -->
+<footer>
+  <div class="container">
+    <div class="foot-top">
+      <div class="foot-brand">
+        <a href="#home" class="brand">
+          <img src="assets/logo-lf-transparent.png" alt="Leaf Graphix logo" style="width:34px;height:34px;">
+          <div class="word"><b>LEAF GRAPHIX</b><span>AI Assisted Studio</span></div>
+        </a>
+        <p>An AI-assisted concept design studio turning ideas into digital reality — from Kerala, for the world.</p>
+        <p class="malayalam">ആശയങ്ങളെ യാഥാർഥ്യമാക്കുന്നു</p>
+      </div>
+      <div class="foot-col">
+        <h5>Studio</h5>
+        <a href="#studio">About the Studio</a>
+        <a href="#approach">Our Process</a>
+        <a href="#portfolio">Portfolio</a>
+        <a href="#contact">Contact</a>
+      </div>
+      <div class="foot-col">
+        <h5>Services</h5>
+        <a href="#services">Architectural Concepts</a>
+        <a href="#services">Ornament Design</a>
+        <a href="#services">Brand Identity</a>
+        <a href="#services">Mood Boards</a>
+      </div>
+      <div class="foot-col">
+        <h5>Studio Location</h5>
+        <a href="#contact" style="pointer-events:none;">Kollam, Kerala, India</a>
+        <a href="#contact" style="pointer-events:none;">hello@leafgraphix.studio</a>
+      </div>
+    </div>
+    <div class="foot-bottom">
+      <p>© 2026 Leaf Graphix Studio. All rights reserved.</p>
+      <div class="foot-social">
+        <a href="#" aria-label="Instagram"><svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.6"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1"/></svg></a>
+        <a href="#" aria-label="LinkedIn"><svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.6"><path d="M4 4h4v16H4zM10 10h4v10h-4zM10 10c0-3 4-5 6-2M20 20v-6a3 3 0 00-6 0"/></svg></a>
+        <a href="#" aria-label="Behance"><svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.6"><path d="M3 7h6M3 7v10h6a3 3 0 000-6H3M15 7h6M14 15a3 3 0 006 0M14 15a3 3 0 016-1"/></svg></a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script src="https://unpkg.com/lenis@1.1.13/dist/lenis.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script>
+gsap.registerPlugin(ScrollTrigger);
+
+/* ---------- preloader ---------- */
+window.addEventListener('load', () => {
+  setTimeout(() => {
+    document.getElementById('preloader').classList.add('hide');
+    playHero();
+  }, 1300);
+});
+// fail-safe in case load event delays (slow video)
+setTimeout(()=>{ document.getElementById('preloader').classList.add('hide'); }, 4500);
+
+/* ---------- smooth scroll (Lenis) ---------- */
+let lenis;
+if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+  lenis = new Lenis({ duration: 1.1, smoothWheel: true, smoothTouch: false });
+  function raf(time){ lenis.raf(time); requestAnimationFrame(raf); }
+  requestAnimationFrame(raf);
+  lenis.on('scroll', ScrollTrigger.update);
+  gsap.ticker.add((time)=>{ lenis.raf(time*1000); });
+  gsap.ticker.lagSmoothing(0);
+}
+
+/* ---------- header state ---------- */
+const header = document.getElementById('siteHeader');
+ScrollTrigger.create({
+  start: 20, end: 99999,
+  onUpdate: (self)=> header.classList.toggle('scrolled', self.scroll() > 20)
+});
+
+/* ---------- active nav link on scroll ---------- */
+const navLinks = document.querySelectorAll('nav.links a');
+const sectionIds = ['home','studio','services','portfolio','about','contact'];
+sectionIds.forEach(id=>{
+  const el = document.getElementById(id);
+  if(!el) return;
+  ScrollTrigger.create({
+    trigger: el, start:'top center', end:'bottom center',
+    onEnter: ()=> setActive(id), onEnterBack: ()=> setActive(id)
+  });
+});
+function setActive(id){
+  navLinks.forEach(a=> a.classList.toggle('active', a.getAttribute('href') === '#'+id));
+}
+
+/* ---------- mobile drawer ---------- */
+const drawer = document.getElementById('mobileDrawer');
+document.getElementById('menuToggle').addEventListener('click', ()=> drawer.classList.add('open'));
+document.getElementById('mobileClose').addEventListener('click', ()=> drawer.classList.remove('open'));
+drawer.querySelectorAll('a').forEach(a=> a.addEventListener('click', ()=> drawer.classList.remove('open')));
+
+/* ---------- hero intro timeline ---------- */
+function playHero(){
+  const tl = gsap.timeline({defaults:{ease:'power3.out'}});
+  tl.to('.eyebrow',{opacity:1,duration:.8})
+    .to('.hero h1 .line span',{opacity:1,y:0,duration:1.1,stagger:.12},'-=.4')
+    .to('.hero-sub',{opacity:1,duration:.9},'-=.6')
+    .to('.hero-cta',{opacity:1,duration:.9},'-=.7')
+    .to('.hero-side',{opacity:1,duration:.9},'-=.8')
+    .to('.statbar',{opacity:1,duration:1},'-=.6')
+    .to('.scroll-cue',{opacity:1,duration:.8},'-=.7');
+
+  // count up stats
+  document.querySelectorAll('.statbar b[data-count]').forEach(el=>{
+    const target = parseFloat(el.dataset.count);
+    const suffix = el.dataset.suffix || '';
+    gsap.fromTo(el, {innerText:0}, {
+      innerText:target, duration:1.8, delay:1.6, ease:'power2.out',
+      snap:{innerText:1},
+      onUpdate: function(){ el.innerText = Math.round(this.targets()[0].innerText) + suffix; }
+    });
+  });
+}
+
+/* ---------- scroll reveals ---------- */
+gsap.utils.toArray('.reveal').forEach((el, i)=>{
+  gsap.to(el, {
+    opacity:1, y:0, duration:1.1, ease:'power3.out',
+    scrollTrigger:{ trigger: el, start:'top 88%' }
+  });
+});
+
+/* ---------- parallax on visuals ---------- */
+gsap.utils.toArray('.studio-visual img, .about-visual img').forEach(img=>{
+  gsap.fromTo(img, {yPercent:-6}, {
+    yPercent:6, ease:'none',
+    scrollTrigger:{ trigger: img, start:'top bottom', end:'bottom top', scrub:true }
+  });
+});
+
+/* ---------- cinematic subtitle line ---------- */
+gsap.fromTo('.cine-copy h3',{opacity:0,y:30},{
+  opacity:1,y:0,duration:1.2,ease:'power3.out',
+  scrollTrigger:{trigger:'.cine-band', start:'top 60%'}
+});
+
+/* ---------- cursor glow (desktop only) ---------- */
+const glow = document.getElementById('cursorGlow');
+if (window.matchMedia('(pointer:fine)').matches){
+  window.addEventListener('mousemove', e=>{
+    gsap.to(glow, {x:e.clientX, y:e.clientY, duration:0.6, ease:'power2.out'});
+  });
+} else {
+  glow.style.display='none';
+}
+
+/* ---------- pause offscreen videos for performance ---------- */
+document.querySelectorAll('video').forEach(v=>{
+  const io = new IntersectionObserver((entries)=>{
+    entries.forEach(entry=>{
+      if(entry.isIntersecting){ v.play().catch(()=>{}); } else { v.pause(); }
+    });
+  }, {threshold:0.15});
+  io.observe(v);
+});
+</script>
+</body>
+</html>
